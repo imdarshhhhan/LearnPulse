@@ -1,0 +1,199 @@
+.page {
+  min-height: 100vh;
+  background: #f6f8fc;
+  color: #172033;
+}
+
+.main {
+  display: grid;
+  width: min(100%, 1200px);
+  gap: 1.2rem;
+  margin: 0 auto;
+  padding: 1.8rem clamp(1rem, 4vw, 3rem) 3rem;
+}
+
+.heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #5b5bd6;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.pageTitle {
+  margin: 0.3rem 0 0;
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  letter-spacing: -0.04em;
+}
+
+.pageDescription {
+  margin: 0.45rem 0 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.backLink {
+  color: #4f46e5;
+  font-size: 0.83rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.backLink:hover,
+.openLink:hover {
+  text-decoration: underline;
+}
+
+.list {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid #e4e9f1;
+  border-radius: 0.9rem;
+  padding: 1rem 1.1rem;
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(15 23 42 / 3%);
+}
+
+.unread {
+  border-color: #c7d2fe;
+  background: #fcfcff;
+}
+
+.cardMain {
+  min-width: 0;
+  flex: 1;
+}
+
+.cardHeading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.type,
+.unreadLabel {
+  border-radius: 999px;
+  padding: 0.2rem 0.48rem;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+.unreadLabel {
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.title {
+  margin: 0.45rem 0 0;
+  color: #273449;
+  font-size: 0.93rem;
+  font-weight: 700;
+}
+
+.message {
+  margin: 0.25rem 0 0;
+  color: #536078;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.time {
+  display: inline-block;
+  margin-top: 0.45rem;
+  color: #8a94a7;
+  font-size: 0.68rem;
+}
+
+.actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.openLink,
+.readButton,
+.markAllButton,
+.retry {
+  border: 0;
+  border-radius: 0.55rem;
+  padding: 0.5rem 0.65rem;
+  background: #eef2ff;
+  color: #4338ca;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.73rem;
+  font-weight: 680;
+  text-decoration: none;
+}
+
+.readButton,
+.retry {
+  border: 1px solid #dbe2ee;
+  background: #fff;
+  color: #475569;
+}
+
+.readButton:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.markAllButton:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.state,
+.error {
+  margin: 0;
+  border: 1px dashed #dbe2ee;
+  border-radius: 0.8rem;
+  padding: 1.2rem;
+  color: #758198;
+  text-align: center;
+}
+
+.error {
+  border-color: #fecaca;
+  background: #fff7f7;
+  color: #b42332;
+}
+
+.retry {
+  display: block;
+  margin: 0.75rem auto;
+}
+
+@media (max-width: 620px) {
+  .card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .actions {
+    flex-wrap: wrap;
+  }
+
+  .heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

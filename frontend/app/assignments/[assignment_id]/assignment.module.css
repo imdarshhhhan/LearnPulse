@@ -1,0 +1,260 @@
+.page {
+  min-height: 100vh;
+  padding: clamp(1.25rem, 4vw, 3rem) 1rem;
+  background: #f6f8fc;
+  color: #172033;
+}
+
+.header,
+.form,
+.result,
+.empty,
+.feedback {
+  width: min(100%, 54rem);
+  margin: 0 auto;
+}
+
+.header {
+  padding-bottom: 1.5rem;
+}
+
+.backLink {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  color: #4f46e5;
+  font-size: 0.88rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #5b5bd6;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0.35rem 0 0;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 760;
+  letter-spacing: -0.04em;
+}
+
+.description,
+.instructions {
+  margin: 0.55rem 0 0;
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+}
+
+.instructions {
+  margin: 0;
+}
+
+.question,
+.result,
+.empty {
+  min-width: 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(15 23 42 / 3%);
+}
+
+.question {
+  margin: 0;
+}
+
+.questionTitle {
+  color: #273449;
+  font-size: 1rem;
+  font-weight: 680;
+  line-height: 1.55;
+}
+
+.questionNumber {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #758198;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.options {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.7rem;
+  padding: 0.75rem;
+  color: #475569;
+  cursor: pointer;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  transition: border-color 140ms ease, background 140ms ease;
+}
+
+.option:has(input:checked) {
+  border-color: #a5b4fc;
+  background: #f5f6ff;
+  color: #3730a3;
+}
+
+.option input {
+  flex: 0 0 auto;
+  margin-top: 0.2rem;
+  accent-color: #4f46e5;
+}
+
+.submitButton,
+.secondaryButton {
+  justify-self: start;
+  border: 0;
+  border-radius: 0.7rem;
+  padding: 0.75rem 1.1rem;
+  background: #4f46e5;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  transition: background 140ms ease;
+}
+
+.submitButton:hover:not(:disabled),
+.secondaryButton:hover {
+  background: #4338ca;
+}
+
+.submitButton:disabled {
+  background: #a5b4fc;
+  cursor: not-allowed;
+}
+
+.result {
+  display: grid;
+  justify-items: start;
+  gap: 0.7rem;
+}
+
+.feedback {
+  margin-top: 1.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(15 23 42 / 3%);
+}
+
+.feedbackTitle {
+  margin: 0.4rem 0 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.feedbackForm {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.feedbackOptions {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+.feedbackLabel {
+  display: grid;
+  gap: 0.4rem;
+  color: #334155;
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+.feedbackInput {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.6rem;
+  padding: 0.7rem;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+  font-weight: 400;
+}
+
+.feedbackNotice {
+  margin: 0;
+  color: #047857;
+  font-size: 0.85rem;
+}
+
+.resultScore {
+  margin: 0;
+  color: #047857;
+  font-size: 2.7rem;
+  font-weight: 780;
+  letter-spacing: -0.05em;
+}
+
+.result .description {
+  margin: 0;
+}
+
+.secondaryButton {
+  margin-top: 0.3rem;
+}
+
+.empty {
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.state,
+.error {
+  width: min(100%, 54rem);
+  margin: 0 auto;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background: #fff;
+  color: #64748b;
+}
+
+.error {
+  margin-bottom: 1rem;
+  background: #fff1f2;
+  color: #b42332;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 520px) {
+  .page {
+    padding-inline: 0.8rem;
+  }
+
+  .backLink {
+    margin-bottom: 1.2rem;
+  }
+}

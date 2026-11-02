@@ -8,6 +8,23 @@ export interface SyncedUser {
   role: UserRole;
   email: string;
   fullName: string;
+  usn: string | null;
+  avatarUrl?: string | null;
+  achievements?: unknown[];
+}
+
+export interface AuthResponse {
+  token: string;
+  tokenType: "bearer";
+  user: SyncedUser;
+}
+
+export interface RegisterPayload {
+  email: string;
+  password: string;
+  fullName: string;
+  role: UserRole;
+  usn?: string;
 }
 
 async function fetchBackend(
@@ -59,6 +76,62 @@ async function throwApiError(
   throw new Error(responseBody);
 }
 
+export async function registerUser(payload: RegisterPayload): Promise<AuthResponse> {
+  const response = await fetchBackend(`${BACKEND_URL}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    await throwApiError(response, "User registration failed.");
+  }
+
+  return response.json();
+}
+
+export async function loginUser(email: string, password: string): Promise<AuthResponse> {
+  const response = await fetchBackend(`${BACKEND_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!response.ok) {
+    await throwApiError(response, "Login failed.");
+  }
+
+  return response.json();
+}
+
+export async function fetchCurrentUser(): Promise<SyncedUser> {
+  const token = typeof window === "undefined" ? "" : localStorage.getItem("userToken");
+  const response = await fetchBackend(`${BACKEND_URL}/auth/me`, {
+    method: "GET",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!response.ok) {
+    await throwApiError(response, "Could not verify your account.");
+  }
+
+  return response.json();
+}
+
+export async function updateStudentUSN(usn: string): Promise<SyncedUser> {
+    const token = typeof window === "undefined" ? "" : localStorage.getItem("userToken");
+    const response = await fetchBackend(`${BACKEND_URL}/auth/usn`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ usn }),
+    });
+    if (!response.ok) {
+      await throwApiError(response, "Could not save your USN.");
+    }
+    return response.json();
+  }
 export async function syncFirebaseSignupWithBackend(payload: {
   idToken: string;
   fullName: string;
@@ -67,16 +140,20 @@ export async function syncFirebaseSignupWithBackend(payload: {
   const response = await fetchBackend(`${BACKEND_URL}/auth/verify-sync-signup`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      email: payload.fullName.includes("@") ? payload.fullName : undefined,
+      password: "legacy-firebase-token",
+      fullName: payload.fullName,
+      roleSelection: payload.roleSelection,
+    }),
   });
 
   if (!response.ok) {
-    await throwApiError(
-      response,
-      "Federated identity signup synchronization failed.",
-    );
+    await throwApiError(response, "Authentication failed.");
   }
-  return response.json();
+
+  const body = await response.json();
+  return body.user ?? body;
 }
 
 export async function syncFirebaseLoginWithBackend(
@@ -89,23 +166,19 @@ export async function syncFirebaseLoginWithBackend(
   });
 
   if (!response.ok) {
-    await throwApiError(
-      response,
-      "Federated identity login synchronization failed.",
-    );
+    await throwApiError(response, "Authentication failed.");
   }
-  return response.json();
+
+  const body = await response.json();
+  return body.user ?? body;
 }
 
-export async function uploadStudyMaterial(
-  textContext: string,
-  firebaseToken: string,
-) {
+export async function uploadStudyMaterial(textContext: string, token: string) {
   const response = await fetchBackend(`${BACKEND_URL}/documents/upload`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${firebaseToken}`,
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ title: "Lesson Context Notes", textBody: textContext }),
   });
@@ -118,8 +191,26 @@ export async function uploadStudyMaterial(
 
 export interface GeneratedQuestion {
   question: string;
+  question_type?: "mcq" | "true_false";
   options: string[];
   answer: string;
+  difficulty: "easy" | "medium" | "difficult";
+  cognitive_level?: "Remember" | "Understand" | "Apply" | "Analyse";
+  cognitiveLevel?: "Remember" | "Understand" | "Apply" | "Analyse";
+  concept_tag?: string;
+  conceptTag?: string;
+  subtopic?: string;
+  explanation?: string;
+  source_quote?: string;
+  sourceQuote?: string;
+  source_page?: number;
+  sourcePage?: number;
+  is_approved_automatically?: boolean;
+  isApprovedAutomatically?: boolean;
+  quality_score?: number;
+  qualityScore?: number;
+  validation_warnings?: string[];
+  validationWarnings?: string[];
 }
 
 export async function createTest(
