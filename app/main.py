@@ -84,8 +84,10 @@ def readSystemRoot():
 class DocumentPayload(BaseModel):
     text: str #text must be string
 
-class GenerationPayload(BaseModel):  #post the data / generate questions
+class GenerationPayload(BaseModel):
     topic: str
+    questionCount: int | None = 5
+    questionType: str | None = "mcq"
 
 @app.post("/ingest")
 def ingest_document(payload: DocumentPayload):
@@ -141,8 +143,12 @@ def create_test(payload: GenerationPayload):
     if len(topic) > 200:
         raise HTTPException(status_code=400, detail="Topic is too long (200 characters max).")
 
+    count = max(1, min(payload.questionCount or 5, 30))
+    q_type = (payload.questionType or "mcq").strip().lower()
+    if q_type not in {"mcq", "true_false"}:
+        q_type = "mcq"
     try:
-        questions = llm_service.generate_test(topic)
+        questions = llm_service.generate_test(topic, num_questions=count, question_type=q_type)
     except RuntimeError as e:
         raise HTTPException(status_code=502, detail=str(e))
     return {"questions": questions}

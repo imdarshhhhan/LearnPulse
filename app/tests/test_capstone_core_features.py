@@ -208,6 +208,54 @@ class CapstoneCoreFeaturesTests(unittest.TestCase):
             self.assertTrue(len(q["options"]) in (2, 4))
             self.assertTrue(len(q.get("source_quote", "")) > 0)
 
+    def test_feature1_strictly_mcq_generation_never_mixes_true_false(self):
+        json_content = (
+            '{"sec1": "Paging divides virtual memory into fixed size blocks.", '
+            '"sec2": "Segmentation divides memory into variable length segments.", '
+            '"sec3": "Virtual memory uses translation lookaside buffers to cache translations.", '
+            '"sec4": "Page faults occur when a requested page is not in physical RAM."}'
+        ).encode("utf-8")
+        text, pages = extract_upload_pages_and_text("memory.json", json_content)
+        from unittest.mock import patch
+        with patch("services.llm_service.is_ollama_server_reachable", return_value=False):
+            llm = LLMService()
+            mcq_questions = llm.generate_test(
+                topic="Virtual Memory",
+                num_questions=4,
+                context=text,
+                pages=pages,
+                question_type="mcq",
+            )
+        self.assertGreaterEqual(len(mcq_questions), 2)
+        for q in mcq_questions:
+            self.assertEqual(q.get("question_type"), "mcq")
+            self.assertEqual(len(q["options"]), 4)
+            self.assertNotEqual(set(o.lower() for o in q["options"]), {"true", "false"})
+
+    def test_feature1_strictly_true_false_generation_never_mixes_mcq(self):
+        json_content = (
+            '{"sec1": "Paging divides virtual memory into fixed size blocks.", '
+            '"sec2": "Segmentation divides memory into variable length segments.", '
+            '"sec3": "Virtual memory uses translation lookaside buffers to cache translations.", '
+            '"sec4": "Page faults occur when a requested page is not in physical RAM."}'
+        ).encode("utf-8")
+        text, pages = extract_upload_pages_and_text("memory.json", json_content)
+        from unittest.mock import patch
+        with patch("services.llm_service.is_ollama_server_reachable", return_value=False):
+            llm = LLMService()
+            tf_questions = llm.generate_test(
+                topic="Virtual Memory",
+                num_questions=4,
+                context=text,
+                pages=pages,
+                question_type="true_false",
+            )
+        self.assertGreaterEqual(len(tf_questions), 2)
+        for q in tf_questions:
+            self.assertEqual(q.get("question_type"), "true_false")
+            self.assertEqual(len(q["options"]), 2)
+            self.assertEqual(set(o.lower() for o in q["options"]), {"true", "false"})
+
     # ─── 2. FEATURE 2: QUESTION QUALITY VALIDATION & FLAGGING ───
     def test_feature2_question_validation_and_flagging(self):
         # A good question

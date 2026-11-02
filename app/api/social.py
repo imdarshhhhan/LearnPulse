@@ -164,6 +164,45 @@ def invite_group_members(
     return {"message": "Invite prepared.", "inviteEmail": email, "groupCode": group.uniqueGroupCode}
 
 
+@router.delete("/groups/{group_id}/members/{member_id}")
+def remove_group_member(
+    group_id: int,
+    member_id: int,
+    db: Session = Depends(getDb),
+    current_user: dict = Depends(get_current_user),
+):
+    group = db.query(StudyGroup).filter(StudyGroup.id == group_id).first()
+    if not group:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group not found.")
+    if group.creatorId != current_user["userId"]:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only the group owner can remove members.")
+    member = next((m for m in group.members if m.id == member_id), None)
+    if not member:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Member not in group.")
+    if member.id == group.creatorId:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Group owner cannot be removed from the group.")
+    group.members.remove(member)
+    db.commit()
+    return {"message": "Member removed from group.", "group": _serialize_group(group)}
+
+
+@router.delete("/groups/{group_id}")
+def delete_group(
+    group_id: int,
+    db: Session = Depends(getDb),
+    current_user: dict = Depends(get_current_user),
+):
+    group = db.query(StudyGroup).filter(StudyGroup.id == group_id).first()
+    if not group:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group not found.")
+    if group.creatorId != current_user["userId"]:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only the group owner can delete the group.")
+    group.members.clear()
+    db.delete(group)
+    db.commit()
+    return {"message": "Group removed successfully."}
+
+
 @router.get("/communities")
 def list_communities(
     db: Session = Depends(getDb),

@@ -16,6 +16,7 @@ from services.document_parser import (
     extract_upload_text,
 )
 from services.llm_service import LLMService
+from services.validator import QuestionValidator
 
 
 router = APIRouter(
@@ -50,6 +51,8 @@ def _require_teacher(current_user: dict) -> int:
 def generate_test_from_upload(
     file: UploadFile = File(...),
     title: str | None = Form(default=None, max_length=200),
+    questionCount: int = Form(default=5),
+    questionType: str = Form(default="mcq"),
     current_user: dict = Depends(get_current_user),
 ):
     _require_teacher(current_user)
@@ -74,8 +77,18 @@ def generate_test_from_upload(
     if len(quiz_title) > 200:
         raise HTTPException(status_code=400, detail="Quiz titles must be 200 characters or fewer.")
 
+    count = max(1, min(questionCount, 30))
+    q_type = (questionType or "mcq").strip().lower()
+    if q_type not in {"mcq", "true_false"}:
+        q_type = "mcq"
     try:
-        questions = llmService.generate_test(quiz_title, context=source_text, pages=pages_data)
+        questions = llmService.generate_test(
+            quiz_title,
+            num_questions=count,
+            context=source_text,
+            pages=pages_data,
+            question_type=q_type,
+        )
     except RuntimeError as exc:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc)) from exc
     return {
@@ -165,7 +178,17 @@ def postTeacherTest(
         raise HTTPException(status_code=400, detail="Topic is missing.")
     if not payload.questions:
         raise HTTPException(status_code=400, detail="Keep at least one question before posting.")
+    seen_stems: list[str] = []
     for number, q in enumerate(payload.questions, start=1):
+        q_stem = q.question.strip()
+        for past_stem in seen_stems:
+            if QuestionValidator.is_duplicate(q_stem, past_stem):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Question {number} is a duplicate of a previously included question in this quiz.",
+                )
+        seen_stems.append(q_stem)
+
         normalized_options = [option.strip().casefold() for option in q.options]
         expected_len = 2 if q.questionType == "true_false" or len(q.options) == 2 else 4
         if (

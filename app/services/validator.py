@@ -4,6 +4,45 @@ from difflib import SequenceMatcher
 
 class QuestionValidator:
 
+    @classmethod
+    def normalize_stem(cls, text: str) -> str:
+        cleaned = re.sub(r"[^\w\s]", "", str(text).lower())
+        return " ".join(cleaned.split())
+
+    @classmethod
+    def is_duplicate(cls, question_a: str, question_b: str) -> bool:
+        norm_a = cls.normalize_stem(question_a)
+        norm_b = cls.normalize_stem(question_b)
+        if not norm_a or not norm_b:
+            return False
+        if norm_a == norm_b:
+            return True
+        words_a = set(norm_a.split())
+        words_b = set(norm_b.split())
+        if words_a and words_b:
+            jaccard = len(words_a & words_b) / len(words_a | words_b)
+            if jaccard >= 0.75:
+                diff = words_a ^ words_b
+                if not all(d.isdigit() for d in diff):
+                    return True
+        if len(norm_a) > 25 and len(norm_b) > 25:
+            ratio = SequenceMatcher(None, norm_a, norm_b).ratio()
+            if ratio >= 0.85:
+                return True
+        return False
+
+    @classmethod
+    def deduplicate_questions(cls, questions: list[dict]) -> list[dict]:
+        unique_questions: list[dict] = []
+        for q in questions:
+            q_text = str(q.get("question") or "").strip()
+            if not q_text:
+                continue
+            is_dup = any(cls.is_duplicate(q_text, str(existing.get("question") or "")) for existing in unique_questions)
+            if not is_dup:
+                unique_questions.append(q)
+        return unique_questions
+
     @staticmethod
     def validate_mcq_structure(quiz_data: dict) -> tuple[bool, list[str]]:
         errors = []
@@ -190,21 +229,21 @@ class QuestionValidator:
                     flags.append("UNGROUNDED_ANSWER")
                     score -= 25.0
 
-        # 8. Cross-question Duplicate Detection
         if existing_questions:
-            q_words = set(re.findall(r"\w+", question.casefold()))
             for past_q in existing_questions:
                 past_text = str(past_q.get("question") or "").strip()
-                if not past_text or past_text == question:
+                if not past_text:
                     continue
-                past_words = set(re.findall(r"\w+", past_text.casefold()))
-                if q_words and past_words:
-                    jaccard = len(q_words & past_words) / len(q_words | past_words)
-                    if jaccard > 0.75:
-                        warnings.append("Question is very similar to another question in this quiz.")
-                        flags.append("CROSS_QUESTION_DUPLICATE")
-                        score -= 25.0
-                        break
+                if past_text.strip().casefold() == question.strip().casefold():
+                    warnings.append("Duplicate question: identical to an existing question in this quiz.")
+                    flags.append("EXACT_DUPLICATE_QUESTION")
+                    score -= 50.0
+                    break
+                elif cls.is_duplicate(question, past_text):
+                    warnings.append("Duplicate question: substantially identical to another question.")
+                    flags.append("CROSS_QUESTION_DUPLICATE")
+                    score -= 35.0
+                    break
 
         final_score = max(0.0, min(100.0, round(score, 1)))
         is_approved = (len(warnings) == 0 and final_score >= 80.0)

@@ -204,3 +204,17 @@ def remove_student_from_class(
         reconcile_assignment_completion_notifications(db, assignment)
     db.commit()
     return _class_data(teacher_class)
+
+
+@router.delete("/{class_id}", status_code=status.HTTP_200_OK)
+def delete_teacher_class(
+    class_id: int = Path(..., gt=0),
+    db: Session = Depends(getDb),
+    current_user: dict = Depends(get_current_user),
+):
+    teacher_id = _require_teacher(current_user)
+    teacher_class = _get_owned_class(db, class_id, teacher_id)
+    teacher_class.members.clear()
+    db.delete(teacher_class)
+    db.commit()
+    return {"status": "success", "message": f"Class '{teacher_class.name}' removed successfully."}
