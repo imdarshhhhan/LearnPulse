@@ -4,7 +4,7 @@ export default function AchievementsPage() {
   return (
     <StudentAccountPage
       title="Achievements"
-      description="Milestones attached to your Quizora account."
+      description="Milestones attached to your LearnPulse account."
       kind="achievements"
     />
   );

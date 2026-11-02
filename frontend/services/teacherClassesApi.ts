@@ -61,3 +61,13 @@ export function removeClassStudent(
     { method: "DELETE" },
   );
 }
+
+export function deleteTeacherClass(
+  classId: number,
+): Promise<{ status: string; message: string }> {
+  return authorizedRequest(
+    `/teacher/classes/${classId}`,
+    "Could not delete this class.",
+    { method: "DELETE" },
+  );
+}

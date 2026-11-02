@@ -35,7 +35,8 @@ export default function CreateTestPage() {
   const [topic, setTopic] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [sourceText, setSourceText] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isFileLoading, setIsFileLoading] = useState(false);
+  const [isTopicLoading, setIsTopicLoading] = useState(false);
   const [error, setError] = useState("");
   const [questions, setQuestions] = useState<GeneratedQuestion[]>([]);
   const [generatedTopic, setGeneratedTopic] = useState("");
@@ -59,6 +60,10 @@ export default function CreateTestPage() {
   const [maxAttempts, setMaxAttempts] = useState(1);
   const [randomizeQuestions, setRandomizeQuestions] = useState(true);
   const [randomizeOptions, setRandomizeOptions] = useState(true);
+  const [fileQuestionCount, setFileQuestionCount] = useState(5);
+  const [fileQuestionType, setFileQuestionType] = useState<"mcq" | "true_false">("mcq");
+  const [topicQuestionCount, setTopicQuestionCount] = useState(5);
+  const [topicQuestionType, setTopicQuestionType] = useState<"mcq" | "true_false">("mcq");
 
   const resetGeneratedQuiz = () => {
     setQuestions([]);
@@ -74,18 +79,18 @@ export default function CreateTestPage() {
 
   const handleTopicSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setLoading(true);
+    setIsTopicLoading(true);
     setError("");
     resetGeneratedQuiz();
     try {
-      const result = await createTest(topic.trim());
+      const result = await createTest(topic.trim(), topicQuestionCount, topicQuestionType);
       setGeneratedTopic(topic.trim());
       setQuizTitle(topic.trim());
       setQuestions(result.questions);
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Could not generate the quiz.");
     } finally {
-      setLoading(false);
+      setIsTopicLoading(false);
     }
   };
 
@@ -100,11 +105,11 @@ export default function CreateTestPage() {
       setError("The file must be 10 MB or smaller.");
       return;
     }
-    setLoading(true);
+    setIsFileLoading(true);
     resetGeneratedQuiz();
     try {
       const title = quizTitle.trim() || selectedFile.name.replace(/\.[^.]+$/, "");
-      const result = await generateTestFromUpload(selectedFile, title);
+      const result = await generateTestFromUpload(selectedFile, title, fileQuestionCount, fileQuestionType);
       setQuizTitle(result.title);
       setGeneratedTopic(result.title);
       setSourceText(result.sourceText);
@@ -116,7 +121,7 @@ export default function CreateTestPage() {
           : "Could not generate a quiz from this file.",
       );
     } finally {
-      setLoading(false);
+      setIsFileLoading(false);
     }
   };
 
@@ -256,8 +261,42 @@ export default function CreateTestPage() {
               {selectedFile.name} · {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
             </p>
           )}
-          <button type="submit" disabled={loading || !selectedFile} className={buttonClass}>
-            {loading ? "Reading material and generating…" : "Generate from file"}
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="block space-y-1 text-sm font-medium">
+              <span>Number of questions</span>
+              <input
+                type="number"
+                min={1}
+                max={30}
+                value={fileQuestionCount}
+                onChange={(event) =>
+                  setFileQuestionCount(
+                    Math.max(1, Math.min(30, parseInt(event.target.value, 10) || 1)),
+                  )
+                }
+                className={inputClass}
+              />
+            </label>
+            <label className="block space-y-1 text-sm font-medium">
+              <span>Question type</span>
+              <select
+                value={fileQuestionType}
+                onChange={(event) =>
+                  setFileQuestionType(event.target.value as "mcq" | "true_false")
+                }
+                className={inputClass}
+              >
+                <option value="mcq">Multiple Choice (MCQ — 4 options)</option>
+                <option value="true_false">True / False (2 options)</option>
+              </select>
+            </label>
+          </div>
+          <button
+            type="submit"
+            disabled={isFileLoading || isTopicLoading || !selectedFile}
+            className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 active:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isFileLoading ? "Reading material and generating…" : "Generate from file"}
           </button>
         </form>
       </Panel>
@@ -275,8 +314,42 @@ export default function CreateTestPage() {
               className={inputClass}
             />
           </label>
-          <button type="submit" disabled={loading || !topic.trim()} className={buttonClass}>
-            {loading ? "Generating…" : "Generate from topic"}
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="block space-y-1 text-sm font-medium">
+              <span>Number of questions</span>
+              <input
+                type="number"
+                min={1}
+                max={30}
+                value={topicQuestionCount}
+                onChange={(event) =>
+                  setTopicQuestionCount(
+                    Math.max(1, Math.min(30, parseInt(event.target.value, 10) || 1)),
+                  )
+                }
+                className={inputClass}
+              />
+            </label>
+            <label className="block space-y-1 text-sm font-medium">
+              <span>Question type</span>
+              <select
+                value={topicQuestionType}
+                onChange={(event) =>
+                  setTopicQuestionType(event.target.value as "mcq" | "true_false")
+                }
+                className={inputClass}
+              >
+                <option value="mcq">Multiple Choice (MCQ — 4 options)</option>
+                <option value="true_false">True / False (2 options)</option>
+              </select>
+            </label>
+          </div>
+          <button
+            type="submit"
+            disabled={isTopicLoading || isFileLoading || !topic.trim()}
+            className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800 active:bg-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isTopicLoading ? "Generating questions…" : "Generate from topic"}
           </button>
         </form>
       </Panel>

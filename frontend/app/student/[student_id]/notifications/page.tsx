@@ -78,7 +78,7 @@ export default function StudentNotificationsPage() {
             : notification,
         ),
       }));
-      window.dispatchEvent(new Event("quizora:notifications-updated"));
+      window.dispatchEvent(new Event("learnpulse:notifications-updated"));
     } catch (requestError) {
       handleError(requestError);
     } finally {
@@ -99,7 +99,7 @@ export default function StudentNotificationsPage() {
           isRead: true,
         })),
       }));
-      window.dispatchEvent(new Event("quizora:notifications-updated"));
+      window.dispatchEvent(new Event("learnpulse:notifications-updated"));
     } catch (requestError) {
       handleError(requestError);
     } finally {

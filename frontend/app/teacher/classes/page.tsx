@@ -14,6 +14,7 @@ import { ApiError } from "@/services/dashboardApi";
 import {
   addClassStudent,
   createTeacherClass,
+  deleteTeacherClass,
   fetchTeacherClasses,
   removeClassStudent,
   searchAvailableStudents,
@@ -144,6 +145,26 @@ export default function TeacherClassesPage() {
     }
   };
 
+  const handleDeleteClass = async (classId: number) => {
+    if (!window.confirm("Are you sure you want to delete this class? This will remove all student enrollments.")) {
+      return;
+    }
+    setError("");
+    setMessage("");
+    setSaving(true);
+    try {
+      await deleteTeacherClass(classId);
+      const remaining = classes.filter((c) => c.id !== classId);
+      setClasses(remaining);
+      setSelectedClassId(remaining[0]?.id ?? null);
+      setMessage("Class removed successfully.");
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Could not delete class.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const availableStudents = students.filter(
     (student) => !selectedClass?.students.some((member) => member.id === student.id),
   );
@@ -213,7 +234,21 @@ export default function TeacherClassesPage() {
           </Panel>
         </div>
 
-        <Panel title={selectedClass ? `${selectedClass.name} · ${selectedClass.memberCount} students` : "Class members"}>
+        <Panel
+          title={selectedClass ? `${selectedClass.name} · ${selectedClass.memberCount} students` : "Class members"}
+          action={
+            selectedClass ? (
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => void handleDeleteClass(selectedClass.id)}
+                className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-xs sm:text-sm font-semibold text-rose-700 shadow-xs transition-colors hover:bg-rose-100 disabled:opacity-50"
+              >
+                Delete Class
+              </button>
+            ) : undefined
+          }
+        >
           {!selectedClass ? (
             <EmptyState>Select a class or create one to manage students.</EmptyState>
           ) : (
@@ -274,9 +309,9 @@ export default function TeacherClassesPage() {
                               type="button"
                               disabled={saving}
                               onClick={() => void handleRemoveStudent(student.id)}
-                              className="font-medium text-red-700 hover:underline disabled:opacity-50"
+                              className="rounded-lg border border-rose-200 bg-rose-50/70 px-3 py-1 text-xs font-semibold text-rose-700 transition-colors hover:bg-rose-100 disabled:opacity-50"
                             >
-                              Remove
+                              Remove from class
                             </button>
                           </td>
                         </tr>

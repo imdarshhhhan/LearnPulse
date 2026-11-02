@@ -106,6 +106,23 @@ export async function joinGroup(code: string): Promise<{ group: StudyGroup; mess
   });
 }
 
+export async function removeGroupMember(
+  groupId: number,
+  memberId: number,
+): Promise<{ group: StudyGroup; message: string }> {
+  return request(`/social/groups/${groupId}/members/${memberId}`, {
+    method: "DELETE",
+  });
+}
+
+export async function deleteGroup(
+  groupId: number,
+): Promise<{ message: string }> {
+  return request(`/social/groups/${groupId}`, {
+    method: "DELETE",
+  });
+}
+
 export async function listCommunities(): Promise<{ communities: Community[] }> {
   return request("/social/communities");
 }

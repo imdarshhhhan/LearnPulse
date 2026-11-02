@@ -275,10 +275,14 @@ export function postTest(payload: {
 export function generateTestFromUpload(
   file: File,
   title: string,
+  questionCount: number = 5,
+  questionType: "mcq" | "true_false" = "mcq",
 ): Promise<{ title: string; sourceText: string; questions: GeneratedQuestion[] }> {
   const body = new FormData();
   body.append("file", file);
   body.append("title", title);
+  body.append("questionCount", String(questionCount));
+  body.append("questionType", questionType);
   return authorizedRequest(
     "/documents/generate-test",
     "Could not generate a quiz from this file.",

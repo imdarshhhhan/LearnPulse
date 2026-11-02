@@ -11,14 +11,16 @@ export function StudentHeader({ user }: { user: SyncedUser }) {
     <header className={styles.header}>
       <div className={styles.headerStart}>
         <StudentNavigationDrawer studentId={user.userId} />
-        <Link href={`/student/${user.userId}`} className={styles.brand} aria-label="Quizora dashboard">
-          {user.avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img className={styles.brandAvatar} src={user.avatarUrl} alt="" />
-          ) : (
-            <span className={styles.brandMark}>Q</span>
-          )}
-          <span>Quizora</span>
+        <Link href={`/student/${user.userId}`} className="flex items-center gap-3 no-underline" aria-label="LearnPulse dashboard">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <span className="text-xl font-bold tracking-tight">
+            <span className="text-blue-600">Learn</span>
+            <span className="text-slate-900">Pulse</span>
+          </span>
         </Link>
       </div>
       <nav className={styles.headerNav} aria-label="Student navigation">

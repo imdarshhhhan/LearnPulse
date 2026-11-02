@@ -11,12 +11,14 @@ import {
 import {
   createCommunity,
   createGroup,
+  deleteGroup,
   fetchCommunityPosts,
   joinCommunity,
   joinGroup,
   listCommunities,
   listGroups,
   publishCommunityPost,
+  removeGroupMember,
   type Community,
   type CommunityPost,
   type StudyGroup,
@@ -132,6 +134,38 @@ function StudySpacesContent() {
     }
   };
 
+  const handleRemoveMember = async (groupId: number, memberId: number): Promise<boolean> => {
+    setBusy(true);
+    clearFeedback();
+    try {
+      const res = await removeGroupMember(groupId, memberId);
+      setGroups((current) => current.map((g) => (g.id === groupId ? res.group : g)));
+      setNotice(res.message || "Member removed from group.");
+      return true;
+    } catch (err) {
+      setError(getErrorMessage(err, "Could not remove member from group."));
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleDeleteGroup = async (groupId: number): Promise<boolean> => {
+    setBusy(true);
+    clearFeedback();
+    try {
+      await deleteGroup(groupId);
+      setGroups((current) => current.filter((g) => g.id !== groupId));
+      setNotice("Study group deleted.");
+      return true;
+    } catch (err) {
+      setError(getErrorMessage(err, "Could not delete study group."));
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const handleCreateCommunity = async (
     name: string,
     description: string,
@@ -219,6 +253,8 @@ function StudySpacesContent() {
             busy={busy}
             onCreateGroup={handleCreateGroup}
             onJoinGroup={handleJoinGroup}
+            onRemoveMember={handleRemoveMember}
+            onDeleteGroup={handleDeleteGroup}
           />
         ) : (
           <div className={styles.communityLayout}>

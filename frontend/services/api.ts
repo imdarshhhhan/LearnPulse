@@ -215,11 +215,13 @@ export interface GeneratedQuestion {
 
 export async function createTest(
   topic: string,
+  questionCount: number = 5,
+  questionType: "mcq" | "true_false" = "mcq",
 ): Promise<{ questions: GeneratedQuestion[] }> {
   const response = await fetchBackend(`${BACKEND_URL}/create-test`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ topic }),
+    body: JSON.stringify({ topic, questionCount, questionType }),
   });
 
   if (!response.ok) {

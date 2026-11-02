@@ -109,31 +109,31 @@ export default function TeacherDashboardPage() {
 
   return (
     <DashboardShell title="Faculty Workspace" user={data?.profile ?? null}>
-      {/* ─── Apple Header Section ─── */}
-      <section className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
+      {/* ─── Hero Header (Google SaaS Style) ─── */}
+      <section className="saas-card rounded-3xl border border-slate-200/90 bg-white p-7 sm:p-9 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50/80 px-3 py-1 text-xs font-semibold text-indigo-700">
-            <span className="h-1.5 w-1.5 rounded-full bg-indigo-600 animate-pulse" />
-            Teacher Operations Hub
+          <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3.5 py-1 text-xs sm:text-sm font-semibold text-blue-700">
+            <span className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
+            LearnPulse Faculty Hub
           </div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900">
-            Create and manage adaptive assessments
+          <h1 className="mt-3 text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+            Create, Assess &amp; Track Student Mastery
           </h1>
-          <p className="mt-1 text-sm text-zinc-500 max-w-2xl">
-            Upload study materials, generate source-grounded questions, examine distractor psychometrics, and assign work to classes.
+          <p className="mt-1.5 text-sm sm:text-base text-slate-600 max-w-3xl leading-relaxed">
+            Generate verifiable source-grounded quizzes, inspect distractor psychometrics, and assign adaptive coursework across classes.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
             onClick={() => setAssignActivityOpen(true)}
-            className="rounded-full border border-zinc-200/90 bg-white px-5 py-2.5 text-sm font-medium text-zinc-800 shadow-2xs transition-all hover:bg-zinc-50 hover:shadow-xs active:scale-[0.98]"
+            className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm sm:text-base font-semibold text-slate-800 shadow-xs transition-all hover:bg-slate-50 hover:border-slate-400 active:scale-[0.98]"
           >
             Assign Activity
           </button>
           <Link
             href="/teacher/create-test"
-            className="rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white shadow-xs transition-all hover:bg-zinc-800 hover:shadow-md active:scale-[0.98]"
+            className="rounded-xl bg-blue-600 px-6 py-2.5 text-sm sm:text-base font-semibold text-white shadow-sm shadow-blue-500/25 transition-all hover:bg-blue-700 active:scale-[0.98]"
           >
             + Create Quiz and Post
           </Link>
@@ -148,7 +148,7 @@ export default function TeacherDashboardPage() {
           <button
             type="button"
             onClick={() => void loadDashboard()}
-            className="rounded-full border border-zinc-300 bg-white px-4 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
+            className="rounded-xl border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
           >
             Try again
           </button>
@@ -156,85 +156,85 @@ export default function TeacherDashboardPage() {
       ) : data ? (
         <>
           {/* ─── Metric Cards ─── */}
-          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard label="Study Materials" value={data.stats.materials} sublabel="Uploaded guides & texts" />
             <StatCard label="Active Assignments" value={data.stats.assignments} sublabel="Assigned across classes" />
             <StatCard label="Questions Bank" value={data.stats.questionsInBank} sublabel="Source-vetted items" />
             <StatCard label="Student Submissions" value={data.stats.submissions} sublabel="Total graded attempts" />
           </section>
 
-          {/* ─── Clean Action Hub (Uncluttered replacement of buttons) ─── */}
-          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {/* ─── Clean Action Hub ─── */}
+          <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <Link
               href="/teacher/classes"
-              className="apple-card p-5 group flex flex-col justify-between hover:border-indigo-300 transition-colors"
+              className="saas-card rounded-2xl border border-slate-200/80 bg-white p-6 group flex flex-col justify-between hover:border-blue-400 hover:shadow-md transition-all"
             >
               <div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700 font-semibold mb-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-700 font-semibold mb-3.5 text-lg">
                   👥
                 </div>
-                <h3 className="font-semibold text-zinc-900 text-sm group-hover:text-indigo-600 transition-colors">
+                <h3 className="font-bold text-slate-900 text-base sm:text-lg group-hover:text-blue-600 transition-colors">
                   Class Management
                 </h3>
-                <p className="mt-1 text-xs text-zinc-500">
-                  Organize rosters, enroll students, and manage USNs.
+                <p className="mt-1.5 text-xs sm:text-sm text-slate-500 leading-relaxed">
+                  Organize rosters, delete classes, and manage student memberships.
                 </p>
               </div>
-              <span className="mt-4 text-xs font-medium text-indigo-600">Open classes →</span>
+              <span className="mt-4 text-xs sm:text-sm font-semibold text-blue-600 group-hover:translate-x-0.5 transition-transform">Manage classes →</span>
             </Link>
 
             <Link
               href="/teacher/performance"
-              className="apple-card p-5 group flex flex-col justify-between hover:border-indigo-300 transition-colors"
+              className="saas-card rounded-2xl border border-slate-200/80 bg-white p-6 group flex flex-col justify-between hover:border-blue-400 hover:shadow-md transition-all"
             >
               <div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 font-semibold mb-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 font-semibold mb-3.5 text-lg">
                   📊
                 </div>
-                <h3 className="font-semibold text-zinc-900 text-sm group-hover:text-emerald-600 transition-colors">
+                <h3 className="font-bold text-slate-900 text-base sm:text-lg group-hover:text-emerald-600 transition-colors">
                   Class Performance & Heatmap
                 </h3>
-                <p className="mt-1 text-xs text-zinc-500">
+                <p className="mt-1.5 text-xs sm:text-sm text-slate-500 leading-relaxed">
                   Concept mastery heatmaps and student learning trends.
                 </p>
               </div>
-              <span className="mt-4 text-xs font-medium text-emerald-600">View analytics →</span>
+              <span className="mt-4 text-xs sm:text-sm font-semibold text-emerald-600 group-hover:translate-x-0.5 transition-transform">View analytics →</span>
             </Link>
 
             <Link
               href="/teacher/submissions"
-              className="apple-card p-5 group flex flex-col justify-between hover:border-indigo-300 transition-colors"
+              className="saas-card rounded-2xl border border-slate-200/80 bg-white p-6 group flex flex-col justify-between hover:border-blue-400 hover:shadow-md transition-all"
             >
               <div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 text-violet-700 font-semibold mb-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700 font-semibold mb-3.5 text-lg">
                   📝
                 </div>
-                <h3 className="font-semibold text-zinc-900 text-sm group-hover:text-violet-600 transition-colors">
+                <h3 className="font-bold text-slate-900 text-base sm:text-lg group-hover:text-indigo-600 transition-colors">
                   Student Submissions
                 </h3>
-                <p className="mt-1 text-xs text-zinc-500">
+                <p className="mt-1.5 text-xs sm:text-sm text-slate-500 leading-relaxed">
                   Answer reviews, score distribution, and audit trails.
                 </p>
               </div>
-              <span className="mt-4 text-xs font-medium text-violet-600">Review submissions →</span>
+              <span className="mt-4 text-xs sm:text-sm font-semibold text-indigo-600 group-hover:translate-x-0.5 transition-transform">Review submissions →</span>
             </Link>
 
             <Link
               href="/teacher/feedback"
-              className="apple-card p-5 group flex flex-col justify-between hover:border-indigo-300 transition-colors"
+              className="saas-card rounded-2xl border border-slate-200/80 bg-white p-6 group flex flex-col justify-between hover:border-blue-400 hover:shadow-md transition-all"
             >
               <div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-700 font-semibold mb-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-700 font-semibold mb-3.5 text-lg">
                   💬
                 </div>
-                <h3 className="font-semibold text-zinc-900 text-sm group-hover:text-amber-600 transition-colors">
+                <h3 className="font-bold text-slate-900 text-base sm:text-lg group-hover:text-amber-600 transition-colors">
                   Student Feedback
                 </h3>
-                <p className="mt-1 text-xs text-zinc-500">
-                  Student clarity ratings and qualitative question notes.
+                <p className="mt-1.5 text-xs sm:text-sm text-slate-500 leading-relaxed">
+                  Clarity ratings and qualitative question notes from students.
                 </p>
               </div>
-              <span className="mt-4 text-xs font-medium text-amber-600">View feedback →</span>
+              <span className="mt-4 text-xs sm:text-sm font-semibold text-amber-600 group-hover:translate-x-0.5 transition-transform">View feedback →</span>
             </Link>
           </section>
 
@@ -391,8 +391,8 @@ export default function TeacherDashboardPage() {
 
       {/* ─── Item & Distractor Analysis Modal (Feature 5) ─── */}
       {analysisMaterialId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-4xl max-h-[85vh] overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl">
+        <div className="popup-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
+          <div className="popup-panel w-full max-w-4xl max-h-[85vh] overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl">
             <div className="flex items-center justify-between pb-4 border-b border-zinc-100">
               <div>
                 <h3 className="text-lg font-semibold text-zinc-900">

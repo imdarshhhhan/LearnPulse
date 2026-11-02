@@ -63,9 +63,20 @@ export default function AuthCard() {
 
   return (
     <div className="authBox">
+      <div className="flex items-center justify-center gap-2.5 mb-4">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-white font-black shadow-md shadow-blue-500/20">
+          <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+          </svg>
+        </div>
+        <span className="text-2xl sm:text-3xl font-black tracking-tight">
+          <span className="text-blue-600">Learn</span>
+          <span className="text-slate-900">Pulse</span>
+        </span>
+      </div>
       <div className="authHeader">
         <h1>{isLogin ? "Welcome Back" : "Create Account"}</h1>
-        <p>{isLogin ? "Sign in to your dashboard" : "Register your system access profile"}</p>
+        <p>{isLogin ? "Sign in to your LearnPulse workspace" : "Register your academic account"}</p>
       </div>
 
       {errorMsg && <div className="alertBanner">⚠️ {errorMsg}</div>}
@@ -161,7 +172,7 @@ export default function AuthCard() {
       </form>
 
       <p className="modePrompt">
-        {isLogin ? "New to Quizora?" : "Already have an account?"}
+        {isLogin ? "New to LearnPulse?" : "Already have an account?"}
         <button
           type="button"
           onClick={toggleMode}

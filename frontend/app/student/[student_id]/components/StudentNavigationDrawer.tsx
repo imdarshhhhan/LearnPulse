@@ -35,10 +35,10 @@ export function StudentNavigationDrawer({ studentId }: { studentId: number }) {
         });
     };
     refreshCount();
-    window.addEventListener("quizora:notifications-updated", refreshCount);
+    window.addEventListener("learnpulse:notifications-updated", refreshCount);
     return () => {
       active = false;
-      window.removeEventListener("quizora:notifications-updated", refreshCount);
+      window.removeEventListener("learnpulse:notifications-updated", refreshCount);
     };
   }, []);
 

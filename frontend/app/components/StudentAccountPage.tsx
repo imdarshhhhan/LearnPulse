@@ -60,12 +60,12 @@ export function StudentAccountPage({
     <DashboardShell title={title} user={user}>
       <ErrorBanner message={error} />
       {user && (
-        <section className="max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <p className="text-sm font-semibold uppercase tracking-wider text-indigo-600">
+        <section className="max-w-4xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <p className="text-sm font-semibold uppercase tracking-wider text-blue-600">
             Student account
           </p>
           <h2 className="mt-2 text-2xl font-bold text-slate-900">{title}</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
+          <p className="mt-2 text-base leading-6 text-slate-600">{description}</p>
           <div className="mt-6">
             {kind === "achievements" ? (
               user.achievements?.length ? (
@@ -83,13 +83,13 @@ export function StudentAccountPage({
                 </ul>
               ) : (
                 <div className="rounded-xl border border-dashed border-slate-300 px-5 py-8 text-center">
-                  <p className="font-medium text-slate-800">No achievements recorded yet</p>
+                  <p className="font-semibold text-slate-800 text-base">No achievements recorded yet</p>
                   <p className="mt-2 text-sm text-slate-500">
                     Keep learning—your account achievements will appear here when they are awarded.
                   </p>
                   <Link
                     href={`/student/${user.userId}`}
-                    className="mt-4 inline-block text-sm font-semibold text-indigo-700 hover:underline"
+                    className="mt-4 inline-block text-sm font-semibold text-blue-600 hover:underline"
                   >
                     Back to dashboard
                   </Link>
@@ -97,25 +97,25 @@ export function StudentAccountPage({
               )
             ) : (
               <dl className="divide-y divide-slate-100">
-                <div className="grid gap-1 py-4 sm:grid-cols-[10rem_1fr]">
+                <div className="grid gap-1 py-4 sm:grid-cols-[12rem_1fr]">
                   <dt className="text-sm font-medium text-slate-500">Full name</dt>
-                  <dd className="m-0 text-sm text-slate-900">{user.fullName}</dd>
+                  <dd className="m-0 text-base font-semibold text-slate-900">{user.fullName}</dd>
                 </div>
-                <div className="grid gap-1 py-4 sm:grid-cols-[10rem_1fr]">
+                <div className="grid gap-1 py-4 sm:grid-cols-[12rem_1fr]">
                   <dt className="text-sm font-medium text-slate-500">Email</dt>
-                  <dd className="m-0 text-sm text-slate-900">{user.email}</dd>
+                  <dd className="m-0 text-base font-semibold text-slate-900">{user.email}</dd>
                 </div>
-                <div className="grid gap-1 py-4 sm:grid-cols-[10rem_1fr]">
+                <div className="grid gap-1 py-4 sm:grid-cols-[12rem_1fr]">
                   <dt className="text-sm font-medium text-slate-500">Account type</dt>
-                  <dd className="m-0 text-sm capitalize text-slate-900">{user.role}</dd>
+                  <dd className="m-0 text-base font-semibold capitalize text-slate-900">{user.role}</dd>
                 </div>
-                <div className="grid gap-1 py-4 sm:grid-cols-[10rem_1fr]">
+                <div className="grid gap-1 py-4 sm:grid-cols-[12rem_1fr]">
                   <dt className="text-sm font-medium text-slate-500">Student USN</dt>
-                  <dd className="m-0 text-sm text-slate-900">{user.usn ?? "Not provided"}</dd>
+                  <dd className="m-0 text-base font-semibold text-slate-900">{user.usn ?? "Not provided"}</dd>
                 </div>
                 {!user.usn && (
                   <form
-                    className="mt-3 space-y-3"
+                    className="mt-4 space-y-3"
                     onSubmit={async (event) => {
                       event.preventDefault();
                       setSavingUsn(true);
@@ -133,7 +133,7 @@ export function StudentAccountPage({
                       }
                     }}
                   >
-                    <label className="block space-y-1 text-sm font-medium">
+                    <label className="block space-y-1.5 text-sm font-medium">
                       <span>Add your Student USN</span>
                       <input
                         required
@@ -141,21 +141,21 @@ export function StudentAccountPage({
                         maxLength={32}
                         value={usn}
                         onChange={(event) => setUsn(event.target.value)}
-                        className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                        className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-slate-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
                       />
                     </label>
                     {usnMessage && <p role="status" className="text-sm text-slate-600">{usnMessage}</p>}
                     <button
                       type="submit"
                       disabled={savingUsn}
-                      className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+                      className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60 shadow-xs"
                     >
                       {savingUsn ? "Saving…" : "Save USN"}
                     </button>
                   </form>
                 )}
-                <p className="pt-3 text-sm leading-6 text-slate-500">
-                  Profile editing and preference controls are not currently available.
+                <p className="pt-4 text-sm leading-6 text-slate-500">
+                  Profile editing and preference controls are managed by your institution administrator.
                 </p>
               </dl>
             )}
