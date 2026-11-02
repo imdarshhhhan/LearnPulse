@@ -1,4 +1,12 @@
 from .auth import router as auth_router
+from .feedback import router as feedback_router
 from .documents import router as documents_router
 from .quizzes import router as quizzes_router
 from .dashboard import router as dashboard_router
+from .social import router as social_router
+from .folders import router as folders_router
+from .homework import router as homework_router
+from .notifications import router as notifications_router
+from .saved_quizzes import router as saved_quizzes_router
+from .teacher_classes import router as teacher_classes_router
+from .teacher_performance import router as teacher_performance_router

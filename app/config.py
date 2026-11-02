@@ -1,29 +1,26 @@
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
 
-# parsing the local .env variables
 load_dotenv()
 
+
 class AppSettings:
-    #securuty architecture layer
-    # Database Portal Connection String Configuration
     DATABASE_URL: str = os.getenv(
-        "DATABASE_URL", 
-        "postgresql://postgres:postgres@localhost:5432/quiz_platform" # Safe generic fallback default
+        "DATABASE_URL",
+        "sqlite:///./quizora.db",
     )
-    
     JWT_SECRET: str = os.getenv(
-        "JWT_SECRET_KEY", 
-        "fallback_default_development_secret_signing_key_matrix"
+        "JWT_SECRET_KEY",
+        "fallback_default_development_secret_signing_key_matrix",
     )
-
-    FIREBASE_PROJECT_ID: str = os.getenv(
-        "NEXT_PUBLIC_FIREBASE_PROJECT_ID",
-        os.getenv("VITE_FIREBASE_PROJECT_ID", ""),
+    JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = int(
+        os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "120")
     )
-    FIREBASE_CLIENT_EMAIL: str = os.getenv("FIREBASE_CLIENT_EMAIL", "")
-    FIREBASE_PRIVATE_KEY: str = os.getenv("FIREBASE_PRIVATE_KEY", "")
-
+    JWT_ISSUER: str = os.getenv("JWT_ISSUER", "quizora")
+    JWT_AUDIENCE: str = os.getenv("JWT_AUDIENCE", "quizora-users")
     FRONTEND_ORIGINS: list[str] = [
         origin.strip()
         for origin in (
@@ -32,5 +29,12 @@ class AppSettings:
         ).split(",")
         if origin.strip()
     ]
+    FOLDER_STORAGE_DIR: Path = Path(
+        os.getenv(
+            "FOLDER_STORAGE_DIR",
+            str(Path(__file__).resolve().parent / "folder_storage"),
+        )
+    ).resolve()
+
 
 settings = AppSettings()

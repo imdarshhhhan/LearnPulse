@@ -1,19 +1,20 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from api.auth import verifyFirebaseTokenDependency
+from api.auth import get_current_user
 from db.models import (
     Assignment,
     ContentMaterial,
     QuestionPool,
     QuizAttempt,
-    StudentMastery,
     User,
 )
 from db.sessions import getDb
+from services.mastery_service import calculate_student_mastery
+from services.homework_service import student_homework
 
 router = APIRouter(prefix="/dashboard", tags=["Dashboards"])
 
@@ -34,7 +35,7 @@ def _iso(value: datetime | None) -> str | None:
 @router.get("/teacher")
 def readTeacherDashboard(
     db: Session = Depends(getDb),
-    currentUser: dict = Depends(verifyFirebaseTokenDependency),
+    currentUser: dict = Depends(get_current_user),
 ):
     _requireRole(currentUser, "teacher")
     teacherId = currentUser["userId"]
@@ -101,63 +102,21 @@ def readTeacherDashboard(
 @router.get("/student")
 def readStudentDashboard(
     db: Session = Depends(getDb),
-    currentUser: dict = Depends(verifyFirebaseTokenDependency),
+    currentUser: dict = Depends(get_current_user),
 ):
     _requireRole(currentUser, "student")
     studentId = currentUser["userId"]
-    now = datetime.utcnow()
-
-    # Assignments + material title + teacher name in one query
-    rows = (
-        db.query(Assignment, ContentMaterial.title, User.fullName)
-        .join(ContentMaterial, Assignment.materialId == ContentMaterial.id)
-        .join(User, Assignment.teacherId == User.id)
-        .order_by(Assignment.dueDate.asc())
-        .all()
-    )
 
     attempts = (
         db.query(QuizAttempt)
-        .filter(QuizAttempt.studentId == studentId)
+        .filter(QuizAttempt.studentId == studentId, QuizAttempt.isSubmitted.is_(True))
         .order_by(QuizAttempt.attemptTimestamp.desc())
         .all()
     )
-    bestScoreByAssignment: dict[int, float] = {}
-    for attempt in attempts:
-        if attempt.assignmentId is None or not attempt.totalQuestions:
-            continue
-        percent = attempt.score / attempt.totalQuestions * 100
-        bestScoreByAssignment[attempt.assignmentId] = max(
-            bestScoreByAssignment.get(attempt.assignmentId, 0.0), percent
-        )
+    assignmentItems = student_homework(db, studentId)
+    assignmentTitles = {assignment["id"]: assignment["title"] for assignment in assignmentItems}
 
-    assignmentTitles = {a.id: a.title for a, _, _ in rows}
-
-    assignmentItems = []
-    for assignment, materialTitle, teacherName in rows:
-        done = assignment.id in bestScoreByAssignment
-        # The due day is inclusive: overdue once the whole day has passed.
-        overdue = assignment.dueDate + timedelta(days=1) <= now
-        assignmentItems.append(
-            {
-                "id": assignment.id,
-                "title": assignment.title,
-                "materialTitle": materialTitle,
-                "teacherName": teacherName,
-                "dueDate": _iso(assignment.dueDate),
-                "status": "completed" if done else ("overdue" if overdue else "open"),
-                "bestScorePercent": (
-                    round(bestScoreByAssignment[assignment.id], 1) if done else None
-                ),
-            }
-        )
-
-    mastery = (
-        db.query(StudentMastery)
-        .filter(StudentMastery.studentId == studentId)
-        .order_by(StudentMastery.masteryScore.asc())  # weakest concepts first
-        .all()
-    )
+    mastery = calculate_student_mastery(db, studentId)
 
     scored = [a for a in attempts if a.totalQuestions]
     averageScore = (
@@ -169,7 +128,11 @@ def readStudentDashboard(
     return {
         "profile": currentUser,
         "stats": {
-            "openAssignments": sum(1 for a in assignmentItems if a["status"] == "open"),
+            "openAssignments": sum(
+                1
+                for assignment in assignmentItems
+                if assignment["status"] in {"upcoming", "pending", "in_progress"}
+            ),
             "completedAssignments": sum(
                 1 for a in assignmentItems if a["status"] == "completed"
             ),
@@ -179,9 +142,14 @@ def readStudentDashboard(
         "assignments": assignmentItems,
         "mastery": [
             {
-                "conceptTag": m.conceptTag,
-                "masteryPercent": round(m.masteryScore * 100),
-                "lastUpdated": _iso(m.lastUpdated),
+                "conceptTag": m["topic"],
+                "masteryPercent": m["masteryPercent"],
+                "sampleSize": m["sampleSize"],
+                "correctAnswers": m["correctAnswers"],
+                "incorrectAnswers": m["incorrectAnswers"],
+                "difficultyErrors": m["errorCounts"],
+                "recentPerformancePercent": m["recentPerformancePercent"],
+                "lastUpdated": m["lastUpdated"],
             }
             for m in mastery
         ],
